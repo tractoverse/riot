@@ -2,7 +2,7 @@
 
 <!-- README.md is generated from README.qmd. Please edit that file -->
 
-# riot <img src="man/figures/logo.png" align="right" height="139" />
+# riot <a href="https://tractoverse.github.io/riot/"><img src="man/figures/logo.png" align="right" height="139" alt="riot website" /></a>
 
 <!-- badges: start -->
 
@@ -85,7 +85,13 @@ uf_left_vtk <- read_bundle(system.file(
   package = "riot"
 ))
 uf_left_vtk
-#> <bundle [2042 streamlines | 9–33 pts/streamline]>
+#> 
+#> ── Object of class `fiber::bundle()` with 2042 streamliness and [9–33] points per streamline. ──
+#> 
+#> • Point attributes: none
+#> • Streamline attributes: none
+#> • Bundle attributes: none
+#> 
 ```
 
 ``` r
@@ -95,7 +101,13 @@ uf_left_vtp <- read_bundle(system.file(
   package = "riot"
 ))
 uf_left_vtp
-#> <bundle [2042 streamlines | 9–33 pts/streamline]>
+#> 
+#> ── Object of class `fiber::bundle()` with 2042 streamliness and [9–33] points per streamline. ──
+#> 
+#> • Point attributes: none
+#> • Streamline attributes: none
+#> • Bundle attributes: none
+#> 
 ```
 
 ### [medInria](https://med.inria.fr) `.fds` files
@@ -107,7 +119,13 @@ uf_left_fds <- read_bundle(system.file(
   package = "riot"
 ))
 uf_left_fds
-#> <bundle [2042 streamlines | 9–33 pts/streamline]>
+#> 
+#> ── Object of class `fiber::bundle()` with 2042 streamliness and [9–33] points per streamline. ──
+#> 
+#> • Point attributes: none
+#> • Streamline attributes: none
+#> • Bundle attributes: none
+#> 
 ```
 
 ### [MRtrix](https://mrtrix.readthedocs.io/en/latest/getting_started/image_data.html) `.tck/.tsf` files
@@ -119,7 +137,13 @@ af_left_tck <- read_bundle(system.file(
   package = "riot"
 ))
 af_left_tck
-#> <bundle [5000 streamlines | 8–54 pts/streamline]>
+#> 
+#> ── Object of class `fiber::bundle()` with 5000 streamliness and [8–54] points per streamline. ──
+#> 
+#> • Point attributes: none
+#> • Streamline attributes: none
+#> • Bundle attributes: none
+#> 
 ```
 
 ### [TrackVis](https://trackvis.org/docs/?subsect=fileformat) `.trk` files
@@ -131,7 +155,13 @@ cc_mid_trk <- read_bundle(system.file(
   package = "riot"
 ))
 cc_mid_trk
-#> <bundle [525 streamlines | 29–270 pts/streamline]>
+#> 
+#> ── Object of class `fiber::bundle()` with 525 streamliness and [29–270] points per streamline. ──
+#> 
+#> • Point attributes: none
+#> • Streamline attributes: none
+#> • Bundle attributes: none
+#> 
 ```
 
 ### Attaching bundle-level metadata with `bundle_data`

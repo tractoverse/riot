@@ -52,6 +52,7 @@ Imports:
 Remotes:
     astamm/rvtk
 Suggests: 
+    pkgdown,
     reticulate,
     tinytest
 SystemRequirements: Python (>= 3.7) with the 'dipy' package is optional;

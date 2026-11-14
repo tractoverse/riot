@@ -1,4 +1,11 @@
 url: https://tractoverse.github.io/riot/
 template:
   bootstrap: 5
-
+  # Dark tractoverse brand: match the shared identity (dark #0d1117 shell)
+  # with riot's signature hue #3ec4b2 as the accent. Mirrors the tractoverse
+  # meta-package reference implementation.
+  bootswatch: darkly
+  theme: arrow-dark
+  includes:
+    in_header: |
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
