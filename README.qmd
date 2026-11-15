@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# riot <img src="man/figures/logo.png" align="right" height="139" />
+# riot <a href="https://tractoverse.github.io/riot/"><img src="man/figures/logo.png" align="right" height="139" alt="riot website" /></a>
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/tractoverse/riot/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tractoverse/riot/actions/workflows/R-CMD-check.yaml)
