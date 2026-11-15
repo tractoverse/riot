@@ -97,8 +97,15 @@ bundle_to_flat_list <- function(x) {
     }
     # Per-streamline scalars are broadcast so C++ writers see a full-length
     # column (their file format stores them separately, but the flat-list
-    # convention requires one value per row).
-    for (nm in names(sl@streamline_data)) {
+    # convention requires one value per row). In fiber's modern API these live
+    # at the bundle level as length-S vectors (lifted from streamlines at
+    # bundle() time); read streamline i's value from there, and also pick up
+    # any keys not lifted because they differed across streamlines.
+    bundle_sl_data <- x@streamline_data
+    for (nm in names(bundle_sl_data)) {
+      out[[nm]] <- rep(bundle_sl_data[[nm]][[i]], n_pts)
+    }
+    for (nm in setdiff(names(sl@streamline_data), names(bundle_sl_data))) {
       out[[nm]] <- rep(sl@streamline_data[[nm]], n_pts)
     }
     out

@@ -59,8 +59,10 @@ lst_sld <- list(
 )
 result_sld <- riot:::flat_list_to_bundle(lst_sld, streamline_cols = "weight")
 expect_true(fiber::is_bundle(result_sld))
-expect_equal(result_sld@streamlines[[1L]]@streamline_data[["weight"]], 0.9)
-expect_equal(result_sld@streamlines[[2L]]@streamline_data[["weight"]], 0.4)
+# streamline_data sits at the bundle level in fiber's modern API; the [[ ]]
+# accessor pushes each streamline's value back down for per-streamline use.
+expect_equal(result_sld[[1L]]@streamline_data[["weight"]], 0.9)
+expect_equal(result_sld[[2L]]@streamline_data[["weight"]], 0.4)
 expect_false("weight" %in% names(result_sld@streamlines[[1L]]@point_data))
 
 # ---- bundle_to_flat_list ----------------------------------------------------
