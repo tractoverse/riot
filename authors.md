@@ -16,7 +16,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/tractoverse/riot/blob/master/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/tractoverse/riot/blob/main/DESCRIPTION)
 
 Stamm A (2026). *riot: R Inputs/Outputs for Tractography*. R package
 version 2.0.0, <https://github.com/tractoverse/riot>.
