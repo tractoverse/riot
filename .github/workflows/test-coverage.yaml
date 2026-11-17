@@ -33,17 +33,19 @@ jobs:
         id: cache-vtk
         with:
           path: ~/vtk-install
-          key: vtk-9.5.2-linux-${{ runner.arch }}
+          # v2: bump to 9.7.2 and add the modules riot actually links
+          # (see configure.R / the rvtk-check workflow).
+          key: vtk-9.7.2-linux-${{ runner.arch }}-v2
 
       - name: Build and install VTK (Linux)
         if: steps.cache-vtk.outputs.cache-hit != 'true'
         run: |
           sudo apt-get install -y libgl1-mesa-dev libxt-dev
           cd /tmp
-          wget -q https://www.vtk.org/files/release/9.5/VTK-9.5.2.tar.gz
-          tar xzf VTK-9.5.2.tar.gz
+          wget -q https://www.vtk.org/files/release/9.7/VTK-9.7.2.tar.gz
+          tar xzf VTK-9.7.2.tar.gz
           mkdir VTK-build && cd VTK-build
-          cmake /tmp/VTK-9.5.2 \
+          cmake /tmp/VTK-9.7.2 \
             -DCMAKE_INSTALL_PREFIX=$HOME/vtk-install \
             -DCMAKE_BUILD_TYPE=Release \
             -DBUILD_SHARED_LIBS=ON \
@@ -54,6 +56,12 @@ jobs:
             -DVTK_GROUP_ENABLE_Web=NO \
             -DVTK_MODULE_ENABLE_VTK_IOLegacy=YES \
             -DVTK_MODULE_ENABLE_VTK_IOXML=YES \
+            -DVTK_MODULE_ENABLE_VTK_IOGeometry=YES \
+            -DVTK_MODULE_ENABLE_VTK_FiltersCore=YES \
+            -DVTK_MODULE_ENABLE_VTK_FiltersGeneral=YES \
+            -DVTK_MODULE_ENABLE_VTK_FiltersGeometry=YES \
+            -DVTK_MODULE_ENABLE_VTK_FiltersModeling=YES \
+            -DVTK_MODULE_ENABLE_VTK_FiltersExtraction=YES \
             -DVTK_MODULE_ENABLE_VTK_CommonCore=YES \
             -DVTK_MODULE_ENABLE_VTK_CommonDataModel=YES
           make -j$(nproc)
