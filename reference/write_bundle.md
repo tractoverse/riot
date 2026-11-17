@@ -70,7 +70,7 @@ to import bundles into R.
 uf_left  <- read_bundle(system.file("extdata", "UF_left.vtp",  package = "riot"))
 #> Number of data points: 38697
 #> Number of streamlines: 2042
-#> v The bundle stored in /home/runner/work/_temp/Library/riot/extdata/UF_left.vtp has been successfully imported.
+#> ✔ The bundle stored in /home/runner/work/_temp/Library/riot/extdata/UF_left.vtp has been successfully imported.
 if (FALSE) { # \dontrun{
 out <- fs::file_temp(ext = ".vtp")
 write_bundle(uf_left, file = out)
