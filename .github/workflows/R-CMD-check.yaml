@@ -80,7 +80,6 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DBUILD_SHARED_LIBS=ON \
             -DVTK_BUILD_ALL_MODULES=OFF \
-            -DVTK_GROUP_ENABLE_Rendering=NO \
             -DVTK_GROUP_ENABLE_Qt=NO \
             -DVTK_GROUP_ENABLE_Views=NO \
             -DVTK_GROUP_ENABLE_Web=NO \
