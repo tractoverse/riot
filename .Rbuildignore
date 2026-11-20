@@ -21,6 +21,7 @@
 ^config\.status$
 ^autom4te\.cache$
 ^src/Makevars\.in$
+^src/vtk_libs\.rsp$
 ^docker$
 .dockerignore
 ^vignettes/\.quarto$
