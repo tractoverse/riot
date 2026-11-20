@@ -102,7 +102,12 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, github::r-lib/sessioninfo
+          # `local::.` pre-installs riot into the workflow library. On Windows,
+          # the R subprocess spawned by the quarto CLI during the vignette
+          # rebuild does not see the temp library R CMD build installs the
+          # package into (quarto-dev/quarto-r#217); a pre-installed copy in
+          # R_LIBS_USER avoids the "there is no package called 'riot'" failure.
+          extra-packages: any::rcmdcheck, github::r-lib/sessioninfo, local::.
           needs: check
           cache-version: ${{ matrix.config.vtk }}
 
