@@ -15,7 +15,14 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/riot.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Vignettes</h6></li>
+    <li><a class="dropdown-item" href="../articles/riot-api.html">The riot package API</a></li>
+  </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -37,6 +44,10 @@
 <h4 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h4>
 <ul><li>
 <strong><code><a href="../reference/read_bundle.html">read_bundle()</a></code> gains a <code>bundle_data</code> argument.</strong> An optional named list can now be passed to <code><a href="../reference/read_bundle.html">read_bundle()</a></code> and will be stored in the <code>@bundle_data</code> slot of the returned <code>bundle</code> object. This makes it easy to attach bundle-level metadata (e.g. subject ID, hemisphere, affine transform) at import time without a separate assignment step. When the file contains a single streamline the argument is ignored with a warning.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h4>
+<ul><li>Added two vignettes: <a href="vignettes/riot.qmd">riot</a> (user-facing: reading, transforming, and writing bundles) and <a href="vignettes/riot-api.qmd">riot-api</a> (developer-facing: public API, internal flat-list contract, C++ layer, and how to add a new format). Built with <strong>Quarto</strong> (<code>VignetteBuilder: quarto</code>).</li>
 </ul></div>
 <div class="section level4">
 <h4 id="internal-changes-development-version">Internal changes<a class="anchor" aria-label="anchor" href="#internal-changes-development-version"></a></h4>

@@ -17,7 +17,14 @@ support eight different formats detailed in the documentation of input argument 
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/riot.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Vignettes</h6></li>
+    <li><a class="dropdown-item" href="../articles/riot-api.html">The riot package API</a></li>
+  </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -78,10 +85,12 @@ Default is <code><a href="https://rdrr.io/r/base/list.html" class="external-link
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <a href="https://tractoverse.github.io/fiber/reference/bundle.html" class="external-link">bundle</a> object when the file contains multiple
 streamlines, or a <a href="https://tractoverse.github.io/fiber/reference/streamline.html" class="external-link">streamline</a> object when it contains
-exactly one. Each <code>streamline</code> is a numeric matrix with at least three
-named columns <code>"X"</code>, <code>"Y"</code>, and <code>"Z"</code> (one row per point along the
-tract). Additional per-point scalar attributes, when present in the source
-file, appear as extra named columns.
+exactly one. Each <code>streamline</code> stores its coordinates as an
+<code>n x 3</code> numeric matrix in the <code>@points</code> slot (columns <code>"X"</code>, <code>"Y"</code>,
+<code>"Z"</code>, one row per point along the tract). Additional per-point scalar
+attributes, when present in the source file, appear in the
+<code>@point_data</code> slot, and per-streamline attributes in the
+<code>@streamline_data</code> slot.
 When a <code>bundle</code> is returned and <code>bundle_data</code> is non-empty, its <code>@bundle_data</code>
 slot is populated with the supplied list.</p>
     </div>

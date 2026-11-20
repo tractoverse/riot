@@ -37,7 +37,16 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="articles/riot.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Vignettes</h6></li>
+    <li><a class="dropdown-item" href="articles/riot-api.html">The riot package API</a></li>
+  </ul>
+</li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -69,11 +78,13 @@
 <li>
 <a href="https://med.inria.fr" class="external-link">medInria</a> <code>.fds</code> files;</li>
 <li>
-<a href="https://mrtrix.readthedocs.io/en/latest/getting_started/image_data.html" class="external-link">MRtrix</a> <code>.tck/.tsf</code> files; and,</li>
+<a href="https://mrtrix.readthedocs.io/en/latest/getting_started/image_data.html" class="external-link">MRtrix</a> <code>.tck/.tsf</code> files;</li>
 <li>
-<a href="https://trackvis.org/docs/?subsect=fileformat" class="external-link">TrackVis</a> <code>.trk</code> files.</li>
+<a href="https://trackvis.org/docs/?subsect=fileformat" class="external-link">TrackVis</a> <code>.trk</code> files; and,</li>
+<li>
+<a href="https://trackvis.org/docs/?subsect=fileformat" class="external-link">TrackVis</a> <code>.trx</code>, <a href="https://docs.dipy.org/" class="external-link">DIPY</a> <code>.dpy</code>, and <code>.fib</code> files through the ‘DIPY’ Python library.</li>
 </ul>
-<p>The package reads tractography data into S7 objects defined by the <a href="https://tractoverse.github.io/fiber/" class="external-link"><strong>fiber</strong></a> package:</p>
+<p>The package reads tractography data into S7 objects defined by the <a href="https://tractoverse.github.io/fiber/" class="external-link">{fiber}</a> package:</p>
 <ul>
 <li>
 <code>streamline</code> — a single fibre tract stored in three typed slots: <code>@points</code> (an <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>×</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">n \times 3</annotation></semantics></math> matrix with columns <code>X</code>, <code>Y</code>, <code>Z</code>), <code>@point_data</code> (a named list of per-point numeric vectors, e.g. diffusion metrics sampled at every point), and <code>@streamline_data</code> (a named list of per-streamline scalar attributes).</li>
@@ -85,8 +96,11 @@
 <ul>
 <li>native <a href="https://vtk.org" class="external-link">VTK</a> <code>.vtk</code> and <code>.vtp</code> files; or,</li>
 <li>
-<a href="https://med.inria.fr" class="external-link">medInria</a> <code>.fds</code> files.</li>
+<a href="https://med.inria.fr" class="external-link">medInria</a> <code>.fds</code> files;</li>
+<li>
+<code>.trk</code>, <code>.tck</code>, <code>.trx</code>, <code>.fib</code>, and <code>.dpy</code> files through the ‘DIPY’ Python library (requires a reference image).</li>
 </ul>
+<p>A guided tour of the package is available in the <code><a href="articles/riot.html">vignette("riot")</a></code> vignette, and the internal design is described in the developer-oriented <code><a href="articles/riot-api.html">vignette("riot-api")</a></code> vignette.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -115,7 +129,7 @@
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">uf_left_vtk</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Object of class `fiber::bundle()` with 2042 streamliness and [9–33] points per streamline. ──</span></span>
+<span><span class="co">#&gt; ── Object of class `fiber::bundle()` with 2042 streamlines and [9–33] points per streamline. ──</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; • Point attributes: none</span></span>
 <span><span class="co">#&gt; • Streamline attributes: none</span></span>
@@ -129,7 +143,7 @@
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">uf_left_vtp</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Object of class `fiber::bundle()` with 2042 streamliness and [9–33] points per streamline. ──</span></span>
+<span><span class="co">#&gt; ── Object of class `fiber::bundle()` with 2042 streamlines and [9–33] points per streamline. ──</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; • Point attributes: none</span></span>
 <span><span class="co">#&gt; • Streamline attributes: none</span></span>
@@ -148,7 +162,7 @@
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">uf_left_fds</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Object of class `fiber::bundle()` with 2042 streamliness and [9–33] points per streamline. ──</span></span>
+<span><span class="co">#&gt; ── Object of class `fiber::bundle()` with 2042 streamlines and [9–33] points per streamline. ──</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; • Point attributes: none</span></span>
 <span><span class="co">#&gt; • Streamline attributes: none</span></span>
@@ -167,7 +181,7 @@
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">af_left_tck</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Object of class `fiber::bundle()` with 5000 streamliness and [8–54] points per streamline. ──</span></span>
+<span><span class="co">#&gt; ── Object of class `fiber::bundle()` with 5000 streamlines and [8–54] points per streamline. ──</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; • Point attributes: none</span></span>
 <span><span class="co">#&gt; • Streamline attributes: none</span></span>
@@ -186,7 +200,7 @@
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">cc_mid_trk</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Object of class `fiber::bundle()` with 525 streamliness and [29–270] points per streamline. ──</span></span>
+<span><span class="co">#&gt; ── Object of class `fiber::bundle()` with 525 streamlines and [29–270] points per streamline. ──</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; • Point attributes: none</span></span>
 <span><span class="co">#&gt; • Streamline attributes: none</span></span>
@@ -274,7 +288,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Aymeric Stamm <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-8725-3654" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Aymeric Stamm <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0002-8725-3654" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>

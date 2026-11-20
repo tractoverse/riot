@@ -1,8 +1,10 @@
 pandoc: 3.8.3
 pkgdown: 2.2.1
 pkgdown_sha: ~
-articles: {}
-last_built: 2026-11-17T08:36Z
+articles:
+  riot-api: riot-api.html
+  riot: riot.html
+last_built: 2026-11-20T21:47Z
 urls:
   reference: https://tractoverse.github.io/riot/reference
   article: https://tractoverse.github.io/riot/articles

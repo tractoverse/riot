@@ -2,7 +2,7 @@
 
 ## Authors
 
-- **Aymeric Stamm**. Author, maintainer.
+- **Aymeric Stamm**. Author, maintainer, copyright holder.
   [](https://orcid.org/0000-0002-8725-3654)
 
 - **Jeroen Ooms**. Contributor.

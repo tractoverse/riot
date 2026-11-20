@@ -14,6 +14,16 @@
   a separate assignment step. When the file contains a single streamline
   the argument is ignored with a warning.
 
+#### Documentation
+
+- Added two vignettes:
+  [riot](https://tractoverse.github.io/riot/news/vignettes/riot.qmd)
+  (user-facing: reading, transforming, and writing bundles) and
+  [riot-api](https://tractoverse.github.io/riot/news/vignettes/riot-api.qmd)
+  (developer-facing: public API, internal flat-list contract, C++ layer,
+  and how to add a new format). Built with **Quarto**
+  (`VignetteBuilder: quarto`).
+
 #### Internal changes
 
 - **C++ source files renamed: `fascicle*` → `bundle*`.**
