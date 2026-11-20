@@ -17,3 +17,9 @@ src/*.dll
 /.quarto/
 src/vtk_libs.rsp
 docs
+inst/doc
+**/.quarto/
+
+# Build artifacts
+*.Rcheck/
+*.tar.gz

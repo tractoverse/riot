@@ -32,10 +32,12 @@ Default is \code{list()}.}
 \value{
 A \link[fiber:bundle]{bundle} object when the file contains multiple
 streamlines, or a \link[fiber:streamline]{streamline} object when it contains
-exactly one. Each \code{streamline} is a numeric matrix with at least three
-named columns \code{"X"}, \code{"Y"}, and \code{"Z"} (one row per point along the
-tract). Additional per-point scalar attributes, when present in the source
-file, appear as extra named columns.
+exactly one. Each \code{streamline} stores its coordinates as an
+\verb{n x 3} numeric matrix in the \verb{@points} slot (columns \code{"X"}, \code{"Y"},
+\code{"Z"}, one row per point along the tract). Additional per-point scalar
+attributes, when present in the source file, appear in the
+\verb{@point_data} slot, and per-streamline attributes in the
+\verb{@streamline_data} slot.
 When a \code{bundle} is returned and \code{bundle_data} is non-empty, its \verb{@bundle_data}
 slot is populated with the supplied list.
 }

@@ -23,3 +23,5 @@
 ^src/Makevars\.in$
 ^docker$
 .dockerignore
+^vignettes/\.quarto$
+^vignettes/*_files$

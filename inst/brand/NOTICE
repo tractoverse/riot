@@ -1,0 +1,52 @@
+Third-party content and provenance
+===================================
+
+This NOTICE records provenance and license for every vendored or bundled
+component in riot, in line with the tractoverse package licensing rule
+(verify that each redistributed library permits the exact use).
+
+1. TinyXML-2 (bundled source, compiled into riot)
+   ----------------------------------------------
+   `src/tinyxml2.h` and `src/tinyxml2.cpp` are from TinyXML-2,
+   https://github.com/leethomason/tinyxml2 (original code by Lee Thomason,
+   www.grinninglizard.com).
+   - License: zlib (permissive; permits use, modification, and redistribution
+     with the notice retained).
+   - Use: source files are bundled inside riot and compiled into the package
+     shared object for the medInria FDS reader/writer.
+   - Modifications: `tinyxml2.cpp` was modified to avoid `printf`/`stdout`
+     per the *Writing R Extensions* manual ("R has its own input/output
+     mechanism"). The original license header is retained in both files (as
+     required by condition 3 of the zlib notice: "This notice may not be
+     removed or altered from any source distribution").
+   - Attribution: "TinyXML-2, original code by Lee Thomason
+     (www.grinninglizard.com), zlib license." See LICENSE.md.
+   - SPDX: Zlib.
+
+2. VTK (linked, NOT bundled)
+   --------------------------
+   riot compiles against VTK headers and links VTK static libraries supplied
+   by the 'rvtk' R package at install time (rvtk: https://github.com/astamm/rvtk,
+   CRAN package rvtk). VTK source code is NOT redistributed with riot.
+   - License: VTK is BSD-3-Clause ("VTK License").
+   - Use: dynamic/static linking at build time only; no VTK source or binaries
+     are shipped in the riot tarball. The installed package links the VTK
+     libraries that rvtk provisions on the user's machine.
+   - SPDX: BSD-3-Clause.
+
+3. Branding (NOT bundled)
+   -----------------------
+   riot's website theme, logo emblem, and colors follow the shared tractoverse
+   brand (see tractoverse/inst/brand/NOTICE). The emblem is a Font Awesome
+   Free icon (feather-pointed) rasterized into the package logo PNG:
+   Font Awesome Free 6.5.2, icons CC BY 4.0 / fonts SIL OFL 1.1 / code MIT,
+   copyright 2024 Fonticons, Inc. See tractoverse/inst/brand/NOTICE for the
+   full provenance record.
+
+4. freesurferformats (inspiration, NOT bundled)
+   ---------------------------------------------
+   riot's MRtrix (.tck/.tsf) and TrackVis (.trk) readers were inspired by
+   Tim Schäfer's 'freesurferformats' R package (CRAN, MIT
+   https://github.com/dfsp-spirit/freesurferformats). No source code is
+   copied; Tim Schäfer is credited as a contributor in DESCRIPTION and
+   acknowledged in README.

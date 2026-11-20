@@ -24,12 +24,15 @@ importing formats are:
 - native [VTK](https://vtk.org) `.vtk` and `.vtp` files;
 - [medInria](https://med.inria.fr) `.fds` files;
 - [MRtrix](https://mrtrix.readthedocs.io/en/latest/getting_started/image_data.html)
-  `.tck/.tsf` files; and,
+  `.tck/.tsf` files;
 - [TrackVis](https://trackvis.org/docs/?subsect=fileformat) `.trk`
-  files.
+  files; and,
+- [TrackVis](https://trackvis.org/docs/?subsect=fileformat) `.trx`,
+  [DIPY](https://docs.dipy.org/) `.dpy`, and `.fib` files through the
+  ‘DIPY’ Python library.
 
 The package reads tractography data into S7 objects defined by the
-[**fiber**](https://tractoverse.github.io/fiber/) package:
+[{fiber}](https://tractoverse.github.io/fiber/) package:
 
 - `streamline` — a single fibre tract stored in three typed slots:
   `@points` (an $n \times 3$ matrix with columns `X`, `Y`, `Z`),
@@ -49,7 +52,13 @@ The package also allows to write bundles back into the following
 exporting formats:
 
 - native [VTK](https://vtk.org) `.vtk` and `.vtp` files; or,
-- [medInria](https://med.inria.fr) `.fds` files.
+- [medInria](https://med.inria.fr) `.fds` files;
+- `.trk`, `.tck`, `.trx`, `.fib`, and `.dpy` files through the ‘DIPY’
+  Python library (requires a reference image).
+
+A guided tour of the package is available in the `vignette("riot")`
+vignette, and the internal design is described in the developer-oriented
+`vignette("riot-api")` vignette.
 
 ## Installation
 
@@ -86,7 +95,7 @@ uf_left_vtk <- read_bundle(system.file(
 ))
 uf_left_vtk
 #> 
-#> ── Object of class `fiber::bundle()` with 2042 streamliness and [9–33] points per streamline. ──
+#> ── Object of class `fiber::bundle()` with 2042 streamlines and [9–33] points per streamline. ──
 #> 
 #> • Point attributes: none
 #> • Streamline attributes: none
@@ -102,7 +111,7 @@ uf_left_vtp <- read_bundle(system.file(
 ))
 uf_left_vtp
 #> 
-#> ── Object of class `fiber::bundle()` with 2042 streamliness and [9–33] points per streamline. ──
+#> ── Object of class `fiber::bundle()` with 2042 streamlines and [9–33] points per streamline. ──
 #> 
 #> • Point attributes: none
 #> • Streamline attributes: none
@@ -120,7 +129,7 @@ uf_left_fds <- read_bundle(system.file(
 ))
 uf_left_fds
 #> 
-#> ── Object of class `fiber::bundle()` with 2042 streamliness and [9–33] points per streamline. ──
+#> ── Object of class `fiber::bundle()` with 2042 streamlines and [9–33] points per streamline. ──
 #> 
 #> • Point attributes: none
 #> • Streamline attributes: none
@@ -138,7 +147,7 @@ af_left_tck <- read_bundle(system.file(
 ))
 af_left_tck
 #> 
-#> ── Object of class `fiber::bundle()` with 5000 streamliness and [8–54] points per streamline. ──
+#> ── Object of class `fiber::bundle()` with 5000 streamlines and [8–54] points per streamline. ──
 #> 
 #> • Point attributes: none
 #> • Streamline attributes: none
@@ -156,7 +165,7 @@ cc_mid_trk <- read_bundle(system.file(
 ))
 cc_mid_trk
 #> 
-#> ── Object of class `fiber::bundle()` with 525 streamliness and [29–270] points per streamline. ──
+#> ── Object of class `fiber::bundle()` with 525 streamlines and [29–270] points per streamline. ──
 #> 
 #> • Point attributes: none
 #> • Streamline attributes: none

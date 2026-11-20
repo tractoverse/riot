@@ -23,10 +23,12 @@
 #'
 #' @return A [bundle][bundle] object when the file contains multiple
 #'   streamlines, or a [streamline][streamline] object when it contains
-#'   exactly one. Each `streamline` is a numeric matrix with at least three
-#'   named columns `"X"`, `"Y"`, and `"Z"` (one row per point along the
-#'   tract). Additional per-point scalar attributes, when present in the source
-#'   file, appear as extra named columns.
+#'   exactly one. Each `streamline` stores its coordinates as an
+#'   `n x 3` numeric matrix in the `@points` slot (columns `"X"`, `"Y"`,
+#'   `"Z"`, one row per point along the tract). Additional per-point scalar
+#'   attributes, when present in the source file, appear in the
+#'   `@point_data` slot, and per-streamline attributes in the
+#'   `@streamline_data` slot.
 #'   When a `bundle` is returned and `bundle_data` is non-empty, its `@bundle_data`
 #'   slot is populated with the supplied list.
 #'
