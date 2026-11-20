@@ -1,0 +1,195 @@
+---
+title: "Importing and exporting bundles with riot"
+vignette: >
+  %\VignetteIndexEntry{Importing and exporting bundles with riot}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+```{r}
+#| label: setup
+library(riot)
+```
+
+## What riot does
+
+[{riot}](https://tractoverse.github.io/riot/) (R Inputs/Outputs for
+Tractography) reads and writes tractography data: bundles of streamlines (3-D
+polylines) reconstructed by fibre-tracking algorithms applied to diffusion MRI
+data. It is the input/output layer of the
+[{tractoverse}](https://github.com/tractoverse/tractoverse) package family.
+
+The central functions are:
+
+- `read_bundle()` — import a bundle from a file in one of the supported
+  formats;
+- `write_bundle()` — export a bundle to a file.
+
+Bundles live in R as the S7 classes `streamline` and `bundle` defined by the
+[{fiber}](https://tractoverse.github.io/fiber/) package:
+
+- a **streamline** holds one fibre tract: `@points` is an $n \times 3$ numeric
+  matrix with columns `X`, `Y`, `Z`; `@point_data` is a named list of
+  per-point scalar attributes (e.g. fractional anisotropy sampled at every
+  point); `@streamline_data` is a named list of per-streamline scalars (e.g. a
+  tract-level weight);
+- a **bundle** is an ordered collection of streamlines in `@streamlines`,
+  plus optional bundle-level metadata in `@bundle_data`.
+
+`read_bundle()` returns a single `streamline` when the file contains exactly
+one tract and a `bundle` otherwise.
+
+## Supported formats
+
+`read_bundle()` reads:
+
+| Format | Extension | Notes |
+|--------|-----------|-------|
+| [VTK](https://vtk.org) legacy & XML | `.vtk`, `.vtp` | native, compiled in C++ |
+| [medInria](https://med.inria.fr) | `.fds` | native, compiled in C++ |
+| [MRtrix](https://mrtrix.readthedocs.io/en/latest/getting_started/image_data.html) | `.tck`, `.tsf` | native, pure R |
+| [TrackVis](https://trackvis.org/docs/?subsect=fileformat) | `.trk` | native, hybrid R/C++ |
+| TrackVis TRX | `.trx` | via 'DIPY' (Python) |
+| DIPY bundles | `.dpy` | via 'DIPY' (Python) |
+| FIB | `.fib` | via 'DIPY' (Python) |
+
+`write_bundle()` writes `.vtk`, `.vtp`, and `.fds` natively, and `.trk`,
+`.tck`, `.trx`, `.fib`, and `.dpy` through 'DIPY'.
+
+The formats read or written through
+[DIPY](https://docs.dipy.org/) require a Python environment with the `dipy`
+package and a reference image (see below).
+
+## Example data
+
+riot ships a few small example bundles in `inst/extdata`:
+
+```{r}
+extdata <- system.file("extdata", package = "riot")
+list.files(extdata)
+```
+
+## Reading a bundle
+
+The most direct way to import a bundle is `read_bundle()` with the path to a
+file:
+
+```{r}
+uf_left_vtk <- read_bundle(system.file(
+  "extdata",
+  "UF_left.vtk",
+  package = "riot"
+))
+uf_left_vtk
+```
+
+The result is a `bundle` (or a `streamline` if the file contains a single
+tract). Its `@streamlines` slot holds one `streamline` per tract:
+
+```{r}
+length(uf_left_vtk)
+nrow(uf_left_vtk@streamlines[[1L]]@points)
+```
+
+You can read any of the supported formats the same way:
+
+```{r}
+uf_left_vtp <- read_bundle(system.file(
+  "extdata",
+  "UF_left.vtp",
+  package = "riot"
+))
+uf_left_fds <- read_bundle(system.file(
+  "extdata",
+  "UF_left.fds",
+  package = "riot"
+))
+af_left_tck <- read_bundle(system.file(
+  "extdata",
+  "AF_left.tck",
+  package = "riot"
+))
+cc_mid_trk <- read_bundle(system.file("extdata", "CCMid.trk", package = "riot"))
+```
+
+### Attaching bundle-level metadata at import time
+
+The `bundle_data` argument lets you attach a named list of metadata directly
+at import time. It is stored in the `@bundle_data` slot of the returned
+`bundle`:
+
+```{r}
+uf_left_meta <- read_bundle(
+  system.file("extdata", "UF_left.vtk", package = "riot"),
+  bundle_data = list(subject = "sub-01", hemisphere = "left")
+)
+uf_left_meta@bundle_data
+```
+
+When the file contains a single streamline, `bundle_data` is ignored with a
+warning (a `streamline` has no `@bundle_data` slot).
+
+### Formats that need a reference image
+
+Formats read through DIPY (`.trx`, `.fib`, `.dpy`) do not store the image
+space they live in. You must pass a reference image to position the bundle
+correctly:
+
+```r
+read_bundle("path/to/bundle.trx", reference_file = "path/to/reference.nii.gz")
+```
+
+This requires `reticulate` and a Python environment with the `dipy` package.
+On first use, reticulate provisions `dipy` automatically in an ephemeral
+virtual environment (reticulate >= 1.41).
+
+## Transforming a bundle
+
+A `bundle` is a plain list of `streamline` objects, so you can use the usual
+list tools or the geometry helpers provided by **fiber**. For example, to
+keep only the first 10 streamlines:
+
+```{r}
+small <- uf_left_vtk
+small@streamlines <- small@streamlines[1:10]
+length(small)
+```
+
+## Writing a bundle
+
+`write_bundle()` exports a `bundle` (or a single `streamline`) to a file. The
+format is chosen from the file extension:
+
+```{r}
+out <- file.path(tempdir(), "UF_left_copy.vtk")
+write_bundle(uf_left_vtk, out)
+
+# Round-trip: read it back
+uf_left_copy <- read_bundle(out)
+all.equal(uf_left_vtk, uf_left_copy)
+```
+
+The same works for `.vtp` and `.fds`. Writing the DIPY-backed formats (`.trk`,
+`.tck`, `.trx`, `.fib`, `.dpy`) requires a reference image:
+
+```r
+write_bundle(uf_left_vtk, "path/to/bundle.trk",
+             reference_file = "path/to/reference.nii.gz")
+```
+
+Some formats keep additional attributes attached to streamlines or points
+(e.g. `.trk` and `.trx`); others (e.g. `.tck` and `.dpy`) do not.
+
+## Where to go next
+
+- The [riot API vignette](riot-api.html) describes the package's internal
+  functions and the design of the C++ layer.
+- The [{fiber}](https://tractoverse.github.io/fiber/) package provides the
+  `streamline` and `bundle` classes.
+- The other tractoverse packages ({rtists} for visualization, {bot} for
+  optimal transport of bundles, {toad} for atlases) build on the same data
+  model.

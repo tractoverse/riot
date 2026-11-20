@@ -5,7 +5,7 @@ Authors@R: c(
     person(
         given = "Aymeric",
         family = "Stamm",
-        role = c("aut", "cre"),
+        role = c("aut", "cre", "cph"),
         email = "aymeric.stamm@cnrs.fr",
         comment = c(ORCID = "0000-0002-8725-3654")
     ),
@@ -49,16 +49,17 @@ Imports:
     fs,
     rlang,
     rvtk
-Remotes:
-    astamm/rvtk
 Suggests: 
+    knitr,
     pkgdown,
+    quarto,
     reticulate,
     tinytest
+VignetteBuilder: quarto
 SystemRequirements: Python (>= 3.7) with the 'dipy' package is optional;
     required only for TRX, FIB, and DPY bundle formats.
 URL: https://github.com/tractoverse/riot,
     https://tractoverse.github.io/riot/
 BugReports: https://github.com/tractoverse/riot/issues
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.1
 Config/roxygen2/markdown: TRUE

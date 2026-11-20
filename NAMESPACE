@@ -2,6 +2,8 @@
 
 export(read_bundle)
 export(write_bundle)
-importFrom(rvtk,CppFlags)
-importFrom(rvtk,LdFlagsFile)
+importFrom(rvtk,
+  CppFlags,
+  LdFlagsFile
+)
 useDynLib(riot, .registration = TRUE)

@@ -126,7 +126,50 @@ sl_mat <- matrix(
 f_be <- tempfile(fileext = ".trk")
 write_trk_file(f_be, list(sl_mat), endian = "big")
 expect_equal(riot:::retrieve_trk_endianness(f_be), "big")
+
+# Full read of the same big-endian file: exercises the byte-swap path
+# (swap4 / read_i32 / read_f32 with need_swap = TRUE) in bundleReaders.cpp
+tr_be <- riot:::read_trk(f_be)
+expect_true(fiber::is_streamline(tr_be))
+expect_equal(unname(tr_be@points), unname(sl_mat), tolerance = 1e-6)
 unlink(f_be)
+
+# ---- C++ ReadTRK: error paths ------------------------------------------------
+
+# Cannot open file (direct C++ call: R's read_trk would fail earlier when it
+# opens the file itself, so hit fopen() directly)
+f_missing <- tempfile(fileext = ".trk")
+expect_error(
+  riot:::ReadTRK(
+    inputFile = f_missing,
+    n_scalars = 0L,
+    n_properties = 0L,
+    n_count = 1L,
+    little_endian = TRUE,
+    scalar_names = character(0),
+    property_names = character(0)
+  )
+)
+unlink(f_missing)
+
+# Header declares more streamlines than the body provides: body ends
+# mid-streamline. write_trk_file writes n_count = 2 in the header but data
+# for only one streamline.
+f_pe <- tempfile(fileext = ".trk")
+write_trk_file(f_pe, list(sl_mat), n_count = 2L)
+expect_error(riot:::read_trk(f_pe), "Premature end")
+unlink(f_pe)
+
+# Header declares a negative num_points: rejected before any parsing.
+# Overwrite the first body int32 (offset 1000) with -1 directly on the
+# raw bytes (0xFFFFFFFF is -1 in both endiannesses).
+f_neg <- tempfile(fileext = ".trk")
+write_trk_file(f_neg, list(sl_mat))
+f_bytes <- readBin(f_neg, "raw", n = file.info(f_neg)$size)
+f_bytes[1001:1004] <- as.raw(rep(0xff, 4L))
+writeBin(f_bytes, f_neg)
+expect_error(riot:::read_trk(f_neg), "Invalid num_points")
+unlink(f_neg)
 
 # ---- retrieve_trk_endianness: abort (neither endian gives 1000) --------------
 

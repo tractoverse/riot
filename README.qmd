@@ -33,11 +33,13 @@ tractography data to and from `R`. Currently supported importing formats are:
 - native [VTK](https://vtk.org) `.vtk` and `.vtp` files;
 - [medInria](https://med.inria.fr) `.fds` files;
 - [MRtrix](https://mrtrix.readthedocs.io/en/latest/getting_started/image_data.html)
-  `.tck/.tsf` files; and,
-- [TrackVis](https://trackvis.org/docs/?subsect=fileformat) `.trk` files.
+  `.tck/.tsf` files;
+- [TrackVis](https://trackvis.org/docs/?subsect=fileformat) `.trk` files; and,
+- [TrackVis](https://trackvis.org/docs/?subsect=fileformat) `.trx`, [DIPY](https://docs.dipy.org/)
+  `.dpy`, and `.fib` files through the 'DIPY' Python library.
 
 The package reads tractography data into S7 objects defined by the
-[**fiber**](https://tractoverse.github.io/fiber/) package:
+[{fiber}](https://tractoverse.github.io/fiber/) package:
 
 - `streamline` — a single fibre tract stored in three typed slots: `@points`
   (an $n \times 3$ matrix with columns `X`, `Y`, `Z`), `@point_data` (a named
@@ -57,7 +59,13 @@ The package also allows to write bundles back into the following exporting
 formats:
 
 - native [VTK](https://vtk.org) `.vtk` and `.vtp` files; or,
-- [medInria](https://med.inria.fr) `.fds` files.
+- [medInria](https://med.inria.fr) `.fds` files;
+- `.trk`, `.tck`, `.trx`, `.fib`, and `.dpy` files through the 'DIPY'
+  Python library (requires a reference image).
+
+A guided tour of the package is available in the `vignette("riot")` vignette,
+and the internal design is described in the developer-oriented
+`vignette("riot-api")` vignette.
 
 ## Installation
 

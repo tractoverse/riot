@@ -88,3 +88,19 @@ flat_sld <- riot:::bundle_to_flat_list(b_sld_rt)
 expect_true("weight" %in% names(flat_sld))
 grp1 <- flat_sld$weight[flat_sld$StreamlineId == 1L]
 expect_true(all(grp1 == grp1[1L]))
+
+# streamlines whose streamline_data keys differ across the bundle: the
+# bundle-level (lifted) keys are read first; the per-streamline broadcast of
+# keys that fiber did not lift (because they differed) is exercised here.
+sl_extra <- fiber::streamline(
+  pts,
+  streamline_data = list(weight = 0.7, n_extra = 2)
+)
+b_diff <- fiber::bundle(list(sl_sld, sl_extra))
+flat_diff <- riot:::bundle_to_flat_list(b_diff)
+expect_true("weight" %in% names(flat_diff))
+# weight is lifted to the bundle level and broadcast to all points
+expect_equal(
+  unique(flat_diff$weight[flat_diff$StreamlineId == 2L]),
+  0.7
+)

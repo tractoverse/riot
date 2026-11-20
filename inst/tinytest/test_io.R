@@ -98,6 +98,39 @@ expect_error(read_bundle(tempfile(fileext = ".dpy")))
 expect_error(read_bundle(tempfile(fileext = ".trx")))
 expect_error(read_bundle(tempfile(fileext = ".fib")))
 
+# ---- read_bundle: bundle_data ------------------------------------------
+
+# bundle_data is stored in the @bundle_data slot of the returned bundle
+tr_meta <- read_bundle(
+  vtk_file,
+  bundle_data = list(subject = "sub-01", hemisphere = "left")
+)
+expect_true(fiber::is_bundle(tr_meta))
+expect_equal(
+  tr_meta@bundle_data,
+  list(subject = "sub-01", hemisphere = "left")
+)
+
+# bundle_data is ignored with a warning when the file holds a single
+# streamline; a streamline (not a bundle) is returned
+tf_single <- tempfile(fileext = ".vtp")
+on.exit(unlink(tf_single), add = TRUE)
+riot:::WriteVTP(
+  list(
+    X = c(0, 1, 2),
+    Y = c(0, 0, 0),
+    Z = c(0, 0, 0),
+    PointId = c(1, 2, 3),
+    StreamlineId = c(1, 1, 1)
+  ),
+  tf_single
+)
+expect_warning(
+  tr_single <- read_bundle(tf_single, bundle_data = list(weight = 1)),
+  "bundle_data"
+)
+expect_true(fiber::is_streamline(tr_single))
+
 # ---- write_bundle: roundtrips ------------------------------------------
 
 # VTK roundtrip
