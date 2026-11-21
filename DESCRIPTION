@@ -48,7 +48,7 @@ Imports:
     fiber,
     fs,
     rlang,
-    rvtk
+    rvtk (>= 0.2.0)
 Suggests: 
     knitr,
     pkgdown,
