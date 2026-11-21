@@ -52,9 +52,13 @@ jobs:
     # reticulate (a Suggests) is intentionally not installed on rhub (we install
     # only hard deps below), so tell R CMD check not to fail on its absence.
     # RHUB_ACTIONS_DEPS_DEPENDENCIES selects the "hard" dependency set in
-    # r-hub/actions/setup-deps@v1 (r-hub's wrapper hardcodes
+    # r-hub/actions/setup-deps@f9c35f7 (r-hub's wrapper hardcodes
     # install-quarto: false when forwarding to setup-r-dependencies, so we must
-    # provide the Quarto CLI ourselves). We use the env var rather than the
+    # provide the Quarto CLI ourselves). We pin setup-deps to the current main
+    # SHA (f9c35f7, "better cache key to avoid cache collisions"): the v1 tag
+    # lacks the platform-name cache-key suffix, so e.g. sanitizer builds
+    # (clang-asan, valgrind) can re-use caches from non-sanitizer builds and
+    # load incompatible packages. We use the env var rather than the
     # `dependencies` input because the input is templated into `inp <- "..."`,
     # and passing the quoted R expression "hard" through that wrapping is
     # fragile; the env var branch is passed straight through and evaluated as R
@@ -106,7 +110,7 @@ jobs:
       # re-added via extra-packages so .qmd vignettes still render and
       # tinytest-based tests still run; _R_CHECK_FORCE_SUGGESTS_ is disabled
       # (job env) so the absent reticulate does not surface as a check NOTE.
-      - uses: r-hub/actions/setup-deps@v1
+      - uses: r-hub/actions/setup-deps@f9c35f7cf9f5d9ac82fae5367ac99458a6a68cbe
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
@@ -155,7 +159,7 @@ jobs:
       # Hard dependencies plus vignette/test-build packages only; see the
       # linux-containers job for why the full Suggests set (reticulate) is not
       # installed on rhub.
-      - uses: r-hub/actions/setup-deps@v1
+      - uses: r-hub/actions/setup-deps@f9c35f7cf9f5d9ac82fae5367ac99458a6a68cbe
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
