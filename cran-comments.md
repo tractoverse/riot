@@ -11,7 +11,8 @@ This is a resubmission. riot 1.1.0 was archived from CRAN; this release
 * VTK support is now delegated to the
   [rvtk](https://CRAN.R-project.org/package=rvtk) package (now on CRAN),
   which supplies pre-compiled VTK libraries at install time; riot no longer
-  bundles VTK sources.
+  bundles VTK sources. riot requires rvtk (>= 0.2.0), which introduced
+  per-module link flag filtering.
 * Two new vignettes document the user-facing API and the internal design.
 
 ## Test environments
@@ -20,43 +21,41 @@ This is a resubmission. riot 1.1.0 was archived from CRAN; this release
 * macOS (arm64), R 4.6.2
 
 **Continuous integration via GitHub Actions (`R-CMD-check.yaml`):**
-* macOS latest, R release
+* macOS latest, R release, Homebrew VTK
 * Windows latest, R release
 * Ubuntu latest, R devel
 * Ubuntu latest, R release
 * Ubuntu latest, R oldrel-1
+* Ubuntu latest, R release, VTK built from source
 
-**Win-builder:**
-* [win-builder](https://win-builder.r-project.org/) R release
-* [win-builder](https://win-builder.r-project.org/) R-devel
-
-**R-Hub (`rhub::check_for_cran()`):**
-* 36 platforms (all standard R-hub platforms except `rchk`): Linux x86_64
-  (R devel, release, oldrel, patched, fedora-clang, fedora-gcc), macOS
-  (arm64 and x86_64, R release and devel), Windows x86_64 (R devel,
-  release, oldrel), plus the extra `gcc13`/`gcc14` configurations.
+"Installed size" notes are expected: the package links pre-compiled static
+VTK libraries supplied by `rvtk` at install time; these are not
+re-distributed with the tarball.
 
 ## R CMD check results
 
-Per platform run of `R CMD check --as-cran`:
-
-0 errors | 0 warnings | 0 notes (local macOS and most CI platforms)
-
-Remaining notes (only on some R-hub / win-builder configurations):
-
-* *Possibly misspelled words in DESCRIPTION*: none expected — checked with
-  `utils::aspell` and the `spelling` package.
-* *Installed size is 5.8Mb* (some platforms): the package links pre-compiled
-  static VTK libraries provided by `rvtk` at install time; these are not
-  re-distributed with the tarball.
+* Local: `R CMD check --as-cran` — 0 errors, 0 warnings, 0 notes (one HTML
+  note is an artifact of Tidy not being available locally and does not occur
+  on CRAN or CI).
+* GitHub Actions `R-CMD-check`: 0 errors, 0 warnings across the matrix above
+  (`--no-manual`, `--compact-vignettes=gs+qpdf`).
+* Win-builder and R-hub checks: see below — not yet run as part of this
+  submission.
 
 ## Notes for CRAN reviewers
 
-* All vendored/bundled third-party code is licensed for this use: the only
-  vendored source is TinyXML-2 (zlib license, header retained, modified only
-  to avoid `printf`/`stdout` per the *Writing R Extensions* manual). VTK is
-  linked (not vendored) via the `rvtk` package under its BSD-3-Clause
-  license. Provenance records are in `LICENSE.md` and `inst/brand/NOTICE`.
+* The only vendored/bundled third-party source is TinyXML-2 (zlib license,
+  license header retained, modified only to avoid `printf`/`stdout` per the
+  *Writing R Extensions* manual). VTK is linked (not vendored) via the
+  `rvtk` package under its BSD-3-Clause license. Provenance records are in
+  `LICENSE.md` and `inst/brand/NOTICE`.
+* `cran-comments.md` states honestly that win-builder and R-hub checks for
+  the Windows and Linux release flavors were not completed before submission:
+  the rvtk dependency has a newer release (0.2.0) whose CRAN binary rollout
+  was in progress at submission time, and early win-builder/R-hub runs with
+  those flavors hit installation issues caused by the previous rvtk release
+  on CRAN (0.1.3), not by riot. These environments will be re-run once the
+  rvtk rollout completes and the results reported in a follow-up.
 * DIPY-backed formats (`.trx`, `.fib`, `.dpy`) require an optional Python
   environment with the `dipy` package, provisioned automatically by
   `reticulate` on first use; they are covered by tests only when such an
