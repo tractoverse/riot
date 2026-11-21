@@ -205,13 +205,13 @@ out <- file.path(tempdir(), "UF_left_copy.vtk")
 write_bundle(uf_left_vtk, out)
 #> Number of streamlines: 2042
 #> Number of arrays: 0
-#> ✔ The bundle stored in `uf_left_vtk` has been successfully exported to '/tmp/RtmpiZeqAK/UF_left_copy.vtk'.
+#> ✔ The bundle stored in `uf_left_vtk` has been successfully exported to '/tmp/Rtmp7pd3ha/UF_left_copy.vtk'.
 
 # Round-trip: read it back
 uf_left_copy <- read_bundle(out)
 #> Number of data points: 38697
 #> Number of streamlines: 2042
-#> ✔ The bundle stored in '/tmp/RtmpiZeqAK/UF_left_copy.vtk' has been successfully imported.
+#> ✔ The bundle stored in '/tmp/Rtmp7pd3ha/UF_left_copy.vtk' has been successfully imported.
 all.equal(uf_left_vtk, uf_left_copy)
 #> [1] TRUE
 ```
