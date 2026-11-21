@@ -49,6 +49,19 @@ jobs:
         config: ${{ fromJson(needs.setup.outputs.containers) }}
     container:
       image: ${{ matrix.config.container }}
+    # reticulate (a Suggests) is intentionally not installed on rhub (we install
+    # only hard deps below), so tell R CMD check not to fail on its absence.
+    # RHUB_ACTIONS_DEPS_DEPENDENCIES selects the "hard" dependency set in
+    # r-hub/actions/setup-deps@v1 (r-hub's wrapper hardcodes
+    # install-quarto: false when forwarding to setup-r-dependencies, so we must
+    # provide the Quarto CLI ourselves). We use the env var rather than the
+    # `dependencies` input because the input is templated into `inp <- "..."`,
+    # and passing the quoted R expression "hard" through that wrapping is
+    # fragile; the env var branch is passed straight through and evaluated as R
+    # by r-lib/actions/setup-r-dependencies.
+    env:
+      _R_CHECK_FORCE_SUGGESTS_: "false"
+      RHUB_ACTIONS_DEPS_DEPENDENCIES: '"hard"'
 
     steps:
       - uses: r-hub/actions/checkout@v1
@@ -56,10 +69,48 @@ jobs:
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
+      # Install Quarto from its self-contained tarball instead of using
+      # quarto-dev/quarto-actions/setup. The generic rhub check-containers are
+      # heterogeneous: some lack `wget` (so that action fails at its download
+      # step with "wget: command not found", exit 127) and others lack
+      # `apt`/`sudo` (its install step then fails with "apt: command not
+      # found", exit 1). Fetching and extracting the tarball needs only
+      # curl/wget and no package manager or root, so it works across all
+      # of them. Pinning avoids the flaky release-manifest fetch entirely.
+      # Quarto is required because the package ships .qmd vignettes, which
+      # R CMD check needs to render.
+      - name: Install Quarto (tarball)
+        shell: bash
+        run: |
+          version=1.11.9
+          url="https://github.com/quarto-dev/quarto-cli/releases/download/v${version}/quarto-${version}-linux-amd64.tar.gz"
+          if command -v curl >/dev/null 2>&1; then
+            curl -fsSL "$url" -o /tmp/quarto.tar.gz
+          elif command -v wget >/dev/null 2>&1; then
+            wget -q -O /tmp/quarto.tar.gz "$url"
+          elif command -v python3 >/dev/null 2>&1; then
+            python3 -c "import urllib.request,sys; urllib.request.urlretrieve(sys.argv[1],'/tmp/quarto.tar.gz')" "$url"
+          else
+            echo "No curl, wget or python3 available to download Quarto" >&2
+            exit 1
+          fi
+          mkdir -p /tmp/quarto
+          tar -xzf /tmp/quarto.tar.gz -C /tmp/quarto --strip-components=1
+          echo "/tmp/quarto/bin" >> "$GITHUB_PATH"
+      # Install only hard dependencies (Depends/Imports/LinkingTo) plus the
+      # packages needed to build vignettes and run tests, but NOT the full
+      # Suggests set. riot's only non-trivial Suggests is `reticulate`, which
+      # is used solely behind requireNamespace("reticulate") guards for the
+      # optional DIPY-backed formats (TRX/FIB/DPY) and is not needed to build,
+      # check, or pass the non-Python test suite. knitr/quarto/tinytest are
+      # re-added via extra-packages so .qmd vignettes still render and
+      # tinytest-based tests still run; _R_CHECK_FORCE_SUGGESTS_ is disabled
+      # (job env) so the absent reticulate does not surface as a check NOTE.
       - uses: r-hub/actions/setup-deps@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
+          extra-packages: 'any::rcmdcheck, any::knitr, any::quarto, any::tinytest'
       - uses: r-hub/actions/run-check@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
@@ -74,6 +125,13 @@ jobs:
       fail-fast: false
       matrix:
         config: ${{ fromJson(needs.setup.outputs.platforms) }}
+    # See the linux-containers job: reticulate (Suggests) is not installed on
+    # rhub, so tell R CMD check not to fail on its absence.
+    # RHUB_ACTIONS_DEPS_DEPENDENCIES selects the "hard" dependency set (see the
+    # linux-containers job comment).
+    env:
+      _R_CHECK_FORCE_SUGGESTS_: "false"
+      RHUB_ACTIONS_DEPS_DEPENDENCIES: '"hard"'
 
     steps:
       - uses: r-hub/actions/checkout@v1
@@ -85,10 +143,23 @@ jobs:
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
+      # Pin a specific Quarto release (instead of the action default "release",
+      # which fetches https://quarto.org/docs/download/_download.json on every
+      # run). That manifest fetch is flaky on some rhub platforms (cURL write
+      # failures -> exit 127), so pinning a version skips it and downloads a
+      # fixed release deterministically. Quarto is required because the
+      # package ships .qmd vignettes, which R CMD check needs to render.
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: '1.11.9'
+      # Hard dependencies plus vignette/test-build packages only; see the
+      # linux-containers job for why the full Suggests set (reticulate) is not
+      # installed on rhub.
       - uses: r-hub/actions/setup-deps@v1
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
+          extra-packages: 'any::rcmdcheck, any::knitr, any::quarto, any::tinytest'
       - uses: r-hub/actions/run-check@v1
         with:
           job-config: ${{ matrix.config.job-config }}
