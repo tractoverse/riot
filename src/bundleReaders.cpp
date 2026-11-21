@@ -218,6 +218,12 @@ PolyDataToList(const vtkSmartPointer<vtkPolyData> &inputData) {
   std::vector<int> arrayComponents(numArrays);
   unsigned int totalArrayCols = 0;
   for (unsigned int a = 0; a < numArrays; ++a) {
+    // GetArray() only returns numeric arrays; non-numeric (e.g. string)
+    // arrays leave a null slot here. Skip them rather than dereferencing.
+    if (!pointData->GetArray(a)) {
+      arrayComponents[a] = -1;
+      continue;
+    }
     int nc = pointData->GetArray(a)->GetNumberOfComponents();
     arrayComponents[a] = nc;
     if (nc == 1) {
@@ -250,6 +256,8 @@ PolyDataToList(const vtkSmartPointer<vtkPolyData> &inputData) {
     unsigned int colOffset = 0;
     for (unsigned int a = 0; a < numArrays; ++a) {
       int nc = arrayComponents[a];
+      if (nc < 0)
+        continue;
       for (int c = 0; c < nc; ++c)
         arrayData[colOffset + c][outIdx] =
             pointData->GetArray(a)->GetComponent(i, c);

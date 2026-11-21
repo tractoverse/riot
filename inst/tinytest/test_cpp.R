@@ -111,6 +111,47 @@ expect_true("tangent#2" %in% names(result_mc))
 expect_equal(length(result_mc[["tangent#0"]]), 4L)
 unlink(f_mc)
 
+# ---- bundleReaders: non-numeric (string) point arrays are skipped ----------
+# VTK GetPointData()->GetNumberOfArrays() counts non-numeric arrays, but
+# GetArray(index) returns NULL for them (numeric-only). PolyDataToList
+# dereferenced those null slots unconditionally (null-pointer UB, caught by
+# clang-asan/clang-ubsan on rhub during vignette rendering). Regression:
+# reading a file with a string array must skip it and keep the numeric data.
+
+f_str <- tempfile(fileext = ".vtk")
+writeLines(
+  c(
+    "# vtk DataFile Version 3.0",
+    "toy data",
+    "ASCII",
+    "DATASET POLYDATA",
+    "POINTS 3 float",
+    "0 0 0",
+    "1 1 1",
+    "2 2 2",
+    "",
+    "LINES 1 4",
+    "3 0 1 2",
+    "",
+    "POINT_DATA 3",
+    "FIELD FieldData 1",
+    "labels 1 3 string",
+    "a",
+    "b",
+    "c"
+  ),
+  f_str
+)
+
+result_str <- riot:::ReadVTK(f_str)
+expect_false("labels" %in% names(result_str))
+expect_equal(result_str$X, c(0, 1, 2))
+expect_equal(result_str$Y, c(0, 1, 2))
+expect_equal(result_str$Z, c(0, 1, 2))
+expect_equal(result_str$PointId, 1:3)
+expect_equal(result_str$StreamlineId, rep(1L, 3L))
+unlink(f_str)
+
 # ---- bundleWriters: single-component extra column roundtrip ---------------
 # write_bundle with a bundle that carries an "FA" per-point column.
 # bundle_to_flat_list adds "FA" (no '#') → ListToPolyData enters while loop
