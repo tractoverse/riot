@@ -159,11 +159,17 @@ jobs:
       # Hard dependencies plus vignette/test-build packages only; see the
       # linux-containers job for why the full Suggests set (reticulate) is not
       # installed on rhub.
+      # `local::.` pre-installs riot into the workflow library. On Windows,
+      # the R subprocess spawned by the quarto CLI during the vignette
+      # rebuild does not see the temp library R CMD build installs the
+      # package into (quarto-dev/quarto-r#217); a pre-installed copy in
+      # R_LIBS_USER avoids the "there is no package called 'riot'" failure
+      # seen on the rhub windows (R-devel) legs.
       - uses: r-hub/actions/setup-deps@f9c35f7cf9f5d9ac82fae5367ac99458a6a68cbe
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
-          extra-packages: 'any::rcmdcheck, any::knitr, any::quarto, any::tinytest'
+          extra-packages: 'any::rcmdcheck, any::knitr, any::quarto, any::tinytest, local::.'
       - uses: r-hub/actions/run-check@v1
         with:
           job-config: ${{ matrix.config.job-config }}
