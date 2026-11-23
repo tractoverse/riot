@@ -39,8 +39,12 @@ re-distributed with the tarball.
   on CRAN or CI).
 * GitHub Actions `R-CMD-check`: 0 errors, 0 warnings across the matrix above
   (`--no-manual`, `--compact-vignettes=gs+qpdf`).
-* Win-builder and R-hub checks: see below — not yet run as part of this
-  submission.
+* R-hub Windows (R-devel): 0 errors, 0 warnings, 0 notes. The rvtk 0.2.0
+  dependency is now fully rolled out on CRAN (previous r-patched and
+  r-release-linux check rows were stale during the rollout).
+* R-hub sanitizer legs (`clang-asan`, `clang-ubsan`) were run on the merged
+  UB fix but stalled in R-hub's linux-container queue; the fix was instead
+  verified locally with UBSan (see below).
 
 ## Notes for CRAN reviewers
 
@@ -49,13 +53,21 @@ re-distributed with the tarball.
   *Writing R Extensions* manual). VTK is linked (not vendored) via the
   `rvtk` package under its BSD-3-Clause license. Provenance records are in
   `LICENSE.md` and `inst/brand/NOTICE`.
-* `cran-comments.md` states honestly that win-builder and R-hub checks for
+* `cran-comments.md` previously noted that win-builder and R-hub checks for
   the Windows and Linux release flavors were not completed before submission:
   the rvtk dependency has a newer release (0.2.0) whose CRAN binary rollout
   was in progress at submission time, and early win-builder/R-hub runs with
   those flavors hit installation issues caused by the previous rvtk release
-  on CRAN (0.1.3), not by riot. These environments will be re-run once the
-  rvtk rollout completes and the results reported in a follow-up.
+  on CRAN (0.1.3), not by riot. The rvtk rollout is now complete (all CRAN
+  check flavors OK) and the R-hub Windows leg passes with the `local::.`
+  workaround in place.
+* A null-pointer issue in the VTK reader (string point-data arrays) found by
+  the clang-asan/clang-ubsan legs was fixed. The fix was verified locally on
+  macOS (arm64): building the pre-fix snapshot with `-fsanitize=undefined`
+  reproduces the exact failure (`runtime error: member call on null pointer
+  of type 'vtkAbstractArray'` at `bundleReaders.cpp:221`), while the
+  post-fix snapshot (PR #20) passes the same string-array reproducer and the
+  full test suite (128/128) under UBSan with no reports.
 * DIPY-backed formats (`.trx`, `.fib`, `.dpy`) require an optional Python
   environment with the `dipy` package, provisioned automatically by
   `reticulate` on first use; they are covered by tests only when such an
