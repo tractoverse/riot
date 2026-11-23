@@ -65,7 +65,7 @@ out <- tempfile(fileext = ".vtk")
 write_bundle(b, out)
 #> Number of streamlines: 2042
 #> Number of arrays: 0
-#> ✔ The bundle stored in `b` has been successfully exported to '/tmp/Rtmpu4ih8J/file1aac608af72e.vtk'.
+#> ✔ The bundle stored in `b` has been successfully exported to '/tmp/RtmpurTTw5/file1ae94cfb330b.vtk'.
 ```
 
 ## Internal functions
