@@ -249,12 +249,17 @@ jobs:
         run: pak::local_install("rvtk", upgrade = FALSE)
 
       # ── 5b. Assert the fedora-clang leg really used the libc++ archive ───────
+      #
+      # vtk.conf is an `=`-separated key/value file, NOT a DCF file — parsing it
+      # with read.dcf() fails with "Line ... is malformed!" on the first line.
+      # rvtk itself parses it with read_vtk_conf() (split on "="); use that so
+      # the assertion matches the real reader.
       - name: Assert rvtk linked the libc++ prebuilt archive
         if: matrix.config.vtk == 'prebuilt-static-libcxx'
         shell: Rscript {0}
         run: |
-          conf <- read.dcf(system.file("vtk.conf", package = "rvtk"))
-          stdlib <- unname(conf[1, "VTK_STDLIB"])
+          conf <- rvtk:::read_vtk_conf()
+          stdlib <- conf[["VTK_STDLIB"]]
           cat("rvtk VTK_STDLIB:", stdlib, "\n")
           stopifnot(identical(stdlib, "libc++"))
           # Sanity: a libstdc++ archive would have been written as libstdc++.
