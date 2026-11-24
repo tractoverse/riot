@@ -68,6 +68,14 @@ re-distributed with the tarball.
   of type 'vtkAbstractArray'` at `bundleReaders.cpp:221`), while the
   post-fix snapshot (PR #20) passes the same string-array reproducer and the
   full test suite (128/128) under UBSan with no reports.
+* CRAN's `r-devel-linux-x86_64-fedora-clang` flavor compiles packages with
+  clang, which targets libc++, while the pre-built VTK static archives rvtk
+  supplies are built with GCC/libstdc++. To remove that ABI risk, rvtk now
+  ships a clang/libc++-built variant of the Linux x86_64 archive and its
+  `configure` selects it automatically when the build compiler targets
+  libc++. riot's CI runs a dedicated leg that installs rvtk and riot with a
+  clang + libc++ toolchain and asserts the libc++ archive is the one that was
+  linked (see the `rvtk-check` workflow).
 * DIPY-backed formats (`.trx`, `.fib`, `.dpy`) require an optional Python
   environment with the `dipy` package, provisioned automatically by
   `reticulate` on first use; they are covered by tests only when such an

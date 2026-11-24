@@ -81,6 +81,15 @@ jobs:
           - {os: ubuntu-latest,  r: 'release', vtk: 'prebuilt-static'}
           - {os: ubuntu-latest,  r: 'release', vtk: 'built-shared'}
           - {os: ubuntu-latest,  r: 'oldrel-1', vtk: 'prebuilt-static'}
+          # Fedora-clang ABI guard: the prebuilt-static archive with a clang +
+          # libc++ toolchain.  CRAN's r-devel-linux-x86_64-fedora-clang flavor
+          # compiles R packages with clang defaulting to libc++, which cannot
+          # load a GCC/libstdc++-built archive (undefined symbol
+          # `__try_use_facet` / `__cxa_call_terminate` at dlopen).  This leg
+          # forces rvtk's configure (via R_MAKEVARS_USER) to detect libc++ and
+          # pick the `*-linux-x86_64-libcxx` archive, then proves riot links and
+          # runs against it.
+          - {os: ubuntu-latest,  r: 'release', vtk: 'prebuilt-static-libcxx'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -120,6 +129,30 @@ jobs:
         if: runner.os == 'Windows' && matrix.config.vtk == 'system'
         shell: bash
         run: pacman -S --noconfirm mingw-w64-ucrt-x86_64-vtk
+
+      # ── 3a-libcxx. clang + libc++ toolchain for the fedora-clang ABI leg ─────
+      # r-lib/actions/setup-r installs R built with GCC on Ubuntu; CRAN's
+      # fedora-clang flavor instead compiles packages with clang + libc++.  Force
+      # exactly that toolchain for the whole leg: apt clang + libc++-dev, and an
+      # R_MAKEVARS_USER file that makes R CMD INSTALL / R CMD SHLIB for rvtk
+      # (and later riot) use `clang++ -stdlib=libc++`.  R exports CXX from
+      # R_MAKEVARS_USER into configure's environment, which is how rvtk's
+      # configure detects libc++ and selects the `*-linux-x86_64-libcxx` archive.
+      - name: Install clang + libc++ toolchain
+        if: matrix.config.vtk == 'prebuilt-static-libcxx'
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends clang libc++-dev libc++abi-dev
+          cat > "$RUNNER_TEMP/Makevars" << 'EOF'
+          CXX=clang++ -stdlib=libc++
+          CXX11=clang++ -stdlib=libc++
+          CXX14=clang++ -stdlib=libc++
+          CXX17=clang++ -stdlib=libc++
+          CXX20=clang++ -stdlib=libc++
+          CC=clang
+          EOF
+          echo "R_MAKEVARS_USER=$RUNNER_TEMP/Makevars" >> "$GITHUB_ENV"
 
       # ── 3b. Built VTK with shared libs – restore from cache ──────────────────
       - name: Cache built shared VTK
@@ -214,6 +247,39 @@ jobs:
         env:
           VTK_LINK_TYPE: ${{ (matrix.config.vtk == 'prebuilt-shared') && 'shared' || '' }}
         run: pak::local_install("rvtk", upgrade = FALSE)
+
+      # ── 5b. Assert the fedora-clang leg really used the libc++ archive ───────
+      #
+      # vtk.conf is an `=`-separated key/value file, NOT a DCF file — parsing it
+      # with read.dcf() fails with "Line ... is malformed!" on the first line.
+      # rvtk itself parses it with read_vtk_conf() (split on "="); use that so
+      # the assertion matches the real reader.
+      - name: Assert rvtk linked the libc++ prebuilt archive
+        if: matrix.config.vtk == 'prebuilt-static-libcxx'
+        shell: Rscript {0}
+        run: |
+          conf <- rvtk:::read_vtk_conf()
+          stdlib <- conf[["VTK_STDLIB"]]
+          cat("rvtk VTK_STDLIB:", stdlib, "\n")
+          stopifnot(identical(stdlib, "libc++"))
+          # Sanity: a libstdc++ archive would have been written as libstdc++.
+          if (file.exists(system.file("prebuilt", package = "rvtk"))) {
+            a <- list.files(system.file("prebuilt/lib", package = "rvtk"),
+                            pattern = "\\.a$", full.names = TRUE)
+            # libvtkscn is the archive that carries the libstdc++-ABI weak refs;
+            # it must not reference __try_use_facet / __cxa_call_terminate here.
+            scn <- grep("vtkscn", a, value = TRUE)
+            if (length(scn)) {
+              out <- system2("nm", c("-C", shQuote(scn)), stdout = TRUE)
+              bad <- grep("__try_use_facet|__cxa_call_terminate", out, value = TRUE)
+              if (length(bad)) {
+                cat("libvtkscn still references libstdc++ ABI symbols:\n")
+                cat(head(bad, 5), sep = "\n")
+                stop("libc++-built archive is contaminated with libstdc++ ABI symbols")
+              }
+            }
+          }
+          cat("libc++ archive clean of libstdc++-ABI symbols\n")
 
       # ── 6. Install riot tied to the rvtk just built ──────────────────────────
       #
