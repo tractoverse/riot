@@ -1,7 +1,7 @@
 ## Resubmission
 
 This is a resubmission. riot 1.1.0 was archived from CRAN; this release
-(v2.0.0) is a major update that modernises the package:
+(v1.2.0) modernises the package:
 
 * The S7 data model (classes `streamline` and `bundle`) has moved to the
   [fiber](https://CRAN.R-project.org/package=fiber) package (now a CRAN
