@@ -11,8 +11,10 @@ This is a resubmission. riot 1.1.0 was archived from CRAN; this release
 * VTK support is now delegated to the
   [rvtk](https://CRAN.R-project.org/package=rvtk) package (now on CRAN),
   which supplies pre-compiled VTK libraries at install time; riot no longer
-  bundles VTK sources. riot requires rvtk (>= 0.2.0), which introduced
-  per-module link flag filtering.
+  bundles VTK sources. riot requires rvtk (>= 0.2.0) and links an explicit
+  subset of VTK modules (the I/O and Common modules riot actually uses) via
+  `rvtk::LdFlagsFile(modules = ...)`, which keeps the link small and the
+  resulting package portable.
 * Two new vignettes document the user-facing API and the internal design.
 
 ## Test environments
@@ -28,6 +30,17 @@ This is a resubmission. riot 1.1.0 was archived from CRAN; this release
 * Ubuntu latest, R oldrel-1
 * Ubuntu latest, R release, VTK built from source
 
+**rvtk-CI matrix (`rvtk-check.yaml`)** — riot is the canonical downstream
+consumer of the `rvtk` development version (`astamm/rvtk@main`). This
+workflow checks riot against the rvtk module-availability and pre-built
+archive contract on the same platform × VTK-supply matrix as rvtk's own
+`riot-check` workflow (system / prebuilt-static / prebuilt-shared /
+built-shared on macOS, Windows, Linux devel/release/oldrel-1, plus a
+clang + libc++ leg that asserts riot links the libc++-built archive). It
+round-trips riot's real shipped VTK files (`UF_left.vtk` / `UF_left.vtp`),
+so a regression in rvtk's archives or flags fails riot's CI before it can
+reach CRAN users.
+
 "Installed size" notes are expected: the package links pre-compiled static
 VTK libraries supplied by `rvtk` at install time; these are not
 re-distributed with the tarball.
@@ -39,9 +52,7 @@ re-distributed with the tarball.
   on CRAN or CI).
 * GitHub Actions `R-CMD-check`: 0 errors, 0 warnings across the matrix above
   (`--no-manual`, `--compact-vignettes=gs+qpdf`).
-* R-hub Windows (R-devel): 0 errors, 0 warnings, 0 notes. The rvtk 0.2.0
-  dependency is now fully rolled out on CRAN (previous r-patched and
-  r-release-linux check rows were stale during the rollout).
+* R-hub Windows (R-devel): 0 errors, 0 warnings, 0 notes.
 * R-hub sanitizer legs (`clang-asan`, `clang-ubsan`) were run on the merged
   UB fix but stalled in R-hub's linux-container queue; the fix was instead
   verified locally with UBSan (see below).
@@ -53,14 +64,10 @@ re-distributed with the tarball.
   *Writing R Extensions* manual). VTK is linked (not vendored) via the
   `rvtk` package under its BSD-3-Clause license. Provenance records are in
   `LICENSE.md` and `inst/brand/NOTICE`.
-* `cran-comments.md` previously noted that win-builder and R-hub checks for
-  the Windows and Linux release flavors were not completed before submission:
-  the rvtk dependency has a newer release (0.2.0) whose CRAN binary rollout
-  was in progress at submission time, and early win-builder/R-hub runs with
-  those flavors hit installation issues caused by the previous rvtk release
-  on CRAN (0.1.3), not by riot. The rvtk rollout is now complete (all CRAN
-  check flavors OK) and the R-hub Windows leg passes with the `local::.`
-  workaround in place.
+* The rvtk dependency (>= 0.2.0) is fully rolled out on CRAN; all CRAN check
+  flavors pass. Early win-builder/R-hub runs against rvtk 0.1.3 were affected
+  by issues in that older release (not by riot); the current R-hub Windows
+  leg passes with the `local::.` workaround in place.
 * A null-pointer issue in the VTK reader (string point-data arrays) found by
   the clang-asan/clang-ubsan legs was fixed. The fix was verified locally on
   macOS (arm64): building the pre-fix snapshot with `-fsanitize=undefined`
