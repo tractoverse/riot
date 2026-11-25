@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   riot-api: riot-api.html
   riot: riot.html
-last_built: 2026-11-25T10:32Z
+last_built: 2026-11-25T10:36Z
 urls:
   reference: https://tractoverse.github.io/riot/reference
   article: https://tractoverse.github.io/riot/articles
