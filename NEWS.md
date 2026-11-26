@@ -1,4 +1,4 @@
-# riot (development version)
+# riot 1.2.0
 
 ### New features
 
@@ -88,8 +88,6 @@
   `_NSEventTrackingRunLoopMode` from `AppKit.framework` — into `riot.so`,
   causing `dlopen()` to fail at check time.
 
-# riot 2.0.0
-
 ## API rename: `read_bundle()` and `write_bundle()`
 
 * **Breaking change**: `read_tractogram()` and `write_tractogram()` are renamed
@@ -148,8 +146,8 @@
 
 * VTK discovery, compilation flags, and pre-built static library distribution
   are now handled entirely by the
-  [`rvtk`](https://github.com/astamm/rvtk) package (pending CRAN
-  submission). `rvtk` supplies pre-compiled VTK headers and libraries so that
+  [`rvtk`](https://CRAN.R-project.org/package=rvtk) package (now on CRAN).
+  `rvtk` supplies pre-compiled VTK headers and libraries so that
   no manual VTK installation is required on most platforms: it honours a
   user-supplied `VTK_DIR` environment variable first, then tries Homebrew
   (macOS), `pkg-config` (macOS/Linux), and well-known system prefixes; on
@@ -158,38 +156,6 @@
   automatically from the `rvtk` GitHub releases.
 * `rvtk` is listed as an `Imports` dependency; downstream packages no longer
   need to locate VTK themselves.
-* The `Remotes: astamm/rvtk` field will be removed from `DESCRIPTION` once
-  `rvtk` is available on CRAN.
-
-# riot 1.2.0
-
-* **Breaking change in system requirements**: riot no longer bundles VTK
-  source files. Instead, it links against an externally installed VTK
-  (>= 9.1.0) at compile time. VTK must be present on the host before
-  installing the package. Both shared and static VTK builds are supported;
-  static builds on macOS and Linux must have been compiled with `-fPIC`.
-* VTK is discovered at install time via `configure` / `configure.win` using,
-  in order of preference:
-  1. A user-supplied `VTK_DIR` environment variable.
-  2. Homebrew (macOS).
-  3. `pkg-config` (macOS and Linux).
-  4. Well-known system include paths (`/usr`, `/usr/local`) (Linux).
-  5. The Rtools42+ pacman package for the active MSYS2 environment
-     (e.g. `mingw-w64-ucrt-x86_64-vtk` for UCRT64) (Windows).
-* On Windows, VTK is loaded dynamically at run time via `addDLLDirectory()`
-  to avoid having to bundle VTK runtime DLLs inside the package.
-* Removed all bundled VTK source files, reducing the installed package size
-  considerably.
-* Updated `SystemRequirements` in `DESCRIPTION` to document the external VTK
-  dependency.
-
-# riot 1.1.1
-
-* Modified VTK source files to avoid compilation warnings arising when using 
-LLVM or Apple clang or GNU gcc compilers.
-* Now ships a shrunk version of VTK source files to avoid unsuccessful downloads 
-from VTK website.
-* Fix compilation errors in `vtkzlib` raised by `clang16`.
 
 # riot 1.1.0
 
